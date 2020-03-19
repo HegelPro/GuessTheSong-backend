@@ -8,23 +8,28 @@ import * as cors from '@koa/cors'
 import * as serve from 'koa-static'
 import * as path from 'path'
 
+import * as express from 'express'
+
 import { ignoreMiddleware } from './server/middlewars/ignore'
 import { sessionMiddleware } from './server/middlewars/session'
 import { bodyMiddleware } from './server/middlewars/body'
 
-import authRouter from './server/routers/auth'
+import authRouterK from './server/routersK/auth'
+import songRouterK from './server/routersK/song'
+
 import songRouter from './server/routers/song'
 
 import { PORT } from './util/secrets'
 
-const app = new Koa()
+const appK = new Koa()
+const app = express()
 
 async function start(): Promise<void> {
   await createConnection().catch(error => console.log(error))
   console.log('db connected!')
 
   await new Promise(res =>
-    app
+    appK
       .use(ignoreMiddleware())
       .use(cors())
       .use(serve(path.join(__dirname, 'public')))
@@ -32,11 +37,16 @@ async function start(): Promise<void> {
       .use(koaBody())
       .use(bodyMiddleware())
       .use(sessionMiddleware())
-      .use(authRouter.routes())
-      .use(songRouter.routes())
+      .use(authRouterK.routes())
+      .use(songRouterK.routes())
       .listen(PORT, res),
   )
   console.log('server connected!')
+  
+  app
+    .use(express.json())
+    .use('/song', songRouter)
+    .listen(5001, () => console.log('express server connected!'))
 }
 
 start()

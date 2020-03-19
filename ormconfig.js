@@ -16,7 +16,7 @@ module.exports = {
   database: DATABASE,
   synchronize: true,
   logging: false,
-  entities: ['src/db/entity/**/*.ts'],
+  entities: ['src/db/entity/**/*.ts', 'src/**/entity/**/*.ts'],
   migrations: ['src/db/migration/**/*.ts'],
   subscribers: ['src/db/subscriber/**/*.ts'],
   cli: {

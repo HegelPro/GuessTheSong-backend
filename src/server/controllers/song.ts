@@ -1,41 +1,38 @@
 import { Song } from '../../db/entity/Song'
 import { getRepository } from 'typeorm'
 import * as Router from 'koa-router'
-import { Maybe } from 'purify-ts'
+import {IServer, ISong} from 'guess-the-song-contracts'
+import { RequestHandler, Request, Response } from 'express'
 
-export async function getSong(ctx: Router.RouterContext): Promise<void> {
-  if (ctx.params.id) {
-    try {
-      const song = await getRepository(Song).findOneOrFail(ctx.params.id)
-      ctx.status = 200
-      ctx.body = song
-    } catch (e) {
-      ctx.status = 400
-      ctx.body = new Error('song not finded')
-    }
-  } else {
-    ctx.status = 400
-    ctx.body = new Error('song not finded')
-  }
-}
+export const getSong: RequestHandler<{id: string}> = (req, res) =>
+  getRepository(Song).findOneOrFail(req.params.id)
+    .then(song => res.send(song))
 
-export async function getSongs(ctx: Router.RouterContext): Promise<void> {
-  const songs = await getRepository(Song).find()
 
-  ctx.status = 200
-  ctx.body = songs
-}
+export const getSongs: RequestHandler = (req, res) =>
+  getRepository(Song).find()
+    .then(songs => res.send(songs))
 
-export async function addSong(ctx: Router.RouterContext): Promise<void> {
-  const song = Song.songParamsToEitherSong(ctx.body)
 
-  if (song.isRight()) {
-    await getRepository(Song).save(song.extract())
+// export async function addSongK(ctx: Router.RouterContext): Promise<void> {
+//   const song = Song.songParamsToEitherSong(ctx.body)
 
-    ctx.status = 200
-    ctx.body = song
-  } else {
-    ctx.status = 400
-    ctx.body = new Error('validate error')
-  }
-}
+//   if (song.isRight()) {
+//     await getRepository(Song).save(song.extract())
+
+//     ctx.status = 200
+//     ctx.body = song
+//   } else {
+//     ctx.status = 400
+//     ctx.body = new Error('validate error')
+//   }
+// }
+
+export const addSong: RequestHandler = (req, res) =>
+  Song.songParamsToEitherSong(req.body as unknown)
+    .ifLeft(() => res.send())
+    .ifRight(song =>
+      getRepository(Song).save(song)
+        .then(song => res.send(song)))
+    
+  
