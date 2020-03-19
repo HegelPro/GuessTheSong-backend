@@ -1,4 +1,4 @@
-import * as multer from 'koa-multer'
+import * as multer from 'multer'
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -9,4 +9,4 @@ const storage = multer.diskStorage({
   },
 })
 
-export default multer({ storage })
+module.exports = multer({ storage })

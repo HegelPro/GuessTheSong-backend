@@ -1,5 +1,4 @@
-const path = require('path')
-const result = require('dotenv').config({ path: path.resolve(process.cwd(), '.env.secret') })
+const result = require('dotenv').config({ path: require('path').resolve(process.cwd(), '.env.secret') })
 
 if (result.error) {
   throw result.error
@@ -16,7 +15,7 @@ module.exports = {
   database: DATABASE,
   synchronize: true,
   logging: false,
-  entities: ['src/db/entity/**/*.ts', 'src/**/entity/**/*.ts'],
+  entities: ['src/db/entity/**/*.ts'],
   migrations: ['src/db/migration/**/*.ts'],
   subscribers: ['src/db/subscriber/**/*.ts'],
   cli: {

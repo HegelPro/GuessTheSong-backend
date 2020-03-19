@@ -1,7 +1,8 @@
-import { BaseContext } from 'koa'
+import { RequestHandler } from 'express'
 
-export const ignoreMiddleware = () => async (ctx: BaseContext, next): Promise<void> => {
-  if (ctx.path === '/favicon.ico') return
-  if (/\/socket.io/.test(ctx.path)) return
-  await next()
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const ignoreMiddleware: () => RequestHandler = () => (req, _, next) => {
+  if (req.path === '/favicon.ico') return
+  if (/\/socket.io/.test(req.path)) return
+  next()
 }
