@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
-import { Codec, string, Right, Either, array } from 'purify-ts'
+import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm'
+import {Codec, string, Either, array} from 'purify-ts'
 
 export type ISongParams = Omit<Song, 'id'>
 
@@ -20,8 +20,17 @@ export class Song {
   @Column('simple-array')
   tags: string[]
 
+  static of({name, author, url, tags}: ISongParams): Song {
+    const newSong = new Song()
+    newSong.name = name
+    newSong.author = author
+    newSong.url = url
+    newSong.tags = [...tags]
+    return newSong
+  }
+
   static merdgeSongs(songOne: Song, songTwo: Song): Song {
-    const { name, author, url, tags } = songTwo
+    const {name, author, url, tags} = songTwo
     songOne.name = name
     songOne.author = author
     songOne.url = url
@@ -30,18 +39,18 @@ export class Song {
   }
 
   static songParamsToEitherSong(songParams: unknown): Either<string, Song> {
-    return Song.songValidator.decode(songParams).chain(song => {
-      const { name, author, url, tags } = song
-      const newSong = new Song()
-      newSong.name = name
-      newSong.author = author
-      newSong.url = url
-      newSong.tags = [...tags]
-      return Right(newSong)
-    })
+    return Song.songParamsValidator.decode(songParams).map(Song.of)
   }
 
-  static songValidator: Codec<ISongParams> = Codec.interface({
+  static songParamsValidator: Codec<ISongParams> = Codec.interface({
+    name: string,
+    author: string,
+    url: string,
+    tags: array(string),
+  })
+
+  static songValidator: Codec<Song> = Codec.interface({
+    id: string,
     name: string,
     author: string,
     url: string,

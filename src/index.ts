@@ -1,14 +1,14 @@
 import 'reflect-metadata'
-import { createConnection } from 'typeorm'
+import {createConnection} from 'typeorm'
 
 import * as express from 'express'
 import * as cors from 'cors'
 import * as path from 'path'
 
-import { ignoreMiddleware } from './server/middlewars/ignore'
+import {ignoreMiddleware} from './server/middlewars/ignore'
 import songRouter from './server/song/router'
 
-import { PORT } from './util/secrets'
+import {PORT} from './util/secrets'
 
 const app = express()
 
