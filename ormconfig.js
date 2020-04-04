@@ -1,10 +1,12 @@
-const result = require('dotenv').config({ path: require('path').resolve(process.cwd(), '.env.secret') })
+const result = require('dotenv').config({
+  path: require('path').resolve(process.cwd(), '.env.secret'),
+})
 
 if (result.error) {
   throw result.error
 }
 
-const { HOST, PORT, USERNAME, PASSWORD, DATABASE } = result.parsed
+const {HOST, PORT, USERNAME, PASSWORD, DATABASE} = result.parsed
 
 module.exports = {
   type: 'mysql',

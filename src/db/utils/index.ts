@@ -1,32 +1,20 @@
-import {Repository} from 'typeorm'
+import { attemptP, FutureInstance } from 'fluture'
+import { QueryFailedError, Repository, ObjectLiteral } from 'typeorm'
 
-export const saveEntity = <T>(
-  repository: Repository<T>,
-  callback: (entity: T) => void,
-  onError?: (e: Error) => void,
-): ((entity: T) => Promise<void>) => (entity: T): Promise<void> =>
-  repository
-    .save(entity)
-    .then(callback)
-    .catch(onError)
+export const getEntity = <E extends ObjectLiteral>(rep: Repository<E>) =>
+  (id: string): FutureInstance<QueryFailedError, E> =>
+    attemptP<QueryFailedError, E>(
+      () => rep.findOneOrFail(id)
+    )
 
-export const findAllEntitys = <T>(
-  repository: Repository<T>,
-  callback: (entity: T[]) => void,
-  onError?: (e: Error) => void,
-): (() => Promise<void>) => (): Promise<void> =>
-  repository
-    .find()
-    .then(callback)
-    .catch(onError)
+export const getAllEntitys = <E extends ObjectLiteral>(rep: Repository<E>) =>
+  (): FutureInstance<QueryFailedError, E[]> =>
+    attemptP<QueryFailedError, E[]>(
+      () => rep.find()
+    )
 
-// Use findOneOrFail() becouse findOne() dont work correct with (T | undefinded)
-export const findEntity = <T>(
-  repository: Repository<T>,
-  callback: (entity: T | undefined) => void,
-  onError?: (e: Error) => void,
-): ((id: string) => Promise<void>) => (id: string): Promise<void> =>
-  repository
-    .findOneOrFail(id)
-    .then(callback)
-    .catch(onError)
+export const updateEntity = <E extends ObjectLiteral>(rep: Repository<E>) =>
+  (entity: E): FutureInstance<QueryFailedError, E> =>
+    attemptP<QueryFailedError, E>(
+      () => rep.save(entity)
+    )
