@@ -1,7 +1,21 @@
 import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm'
-import {Codec, string, Either, array} from 'purify-ts'
+import {
+  Codec,
+  string,
+  Either,
+  array,
+  oneOf,
+  undefinedType,
+  Maybe,
+} from 'purify-ts'
 
-export type ISongParams = Omit<Song, 'id'>
+export interface OfParams {
+  id: string | undefined
+  name: string
+  author: string
+  url: string
+  tags: string[]
+}
 
 @Entity()
 export class Song {
@@ -20,8 +34,9 @@ export class Song {
   @Column('simple-array')
   tags: string[]
 
-  static of({name, author, url, tags}: ISongParams): Song {
+  static of({id, name, author, url, tags}: OfParams): Song {
     const newSong = new Song()
+    newSong.id = Maybe.fromNullable(id).orDefault(newSong.id)
     newSong.name = name
     newSong.author = author
     newSong.url = url
@@ -29,27 +44,19 @@ export class Song {
     return newSong
   }
 
-  static merdgeSongs(songOne: Song, songTwo: Song): Song {
-    const {name, author, url, tags} = songTwo
-    songOne.name = name
-    songOne.author = author
-    songOne.url = url
-    songOne.tags = [...tags]
-    return songOne
-  }
-
   static songParamsToEitherSong(songParams: unknown): Either<string, Song> {
-    return Song.songParamsValidator.decode(songParams).map(Song.of)
+    return Song.ofParamsValidator.decode(songParams).map(Song.of)
   }
 
-  static songParamsValidator: Codec<ISongParams> = Codec.interface({
+  static ofParamsValidator: Codec<OfParams> = Codec.interface({
+    id: oneOf([string, undefinedType]),
     name: string,
     author: string,
     url: string,
     tags: array(string),
   })
 
-  static songValidator: Codec<Song> = Codec.interface({
+  static validator: Codec<Song> = Codec.interface({
     id: string,
     name: string,
     author: string,

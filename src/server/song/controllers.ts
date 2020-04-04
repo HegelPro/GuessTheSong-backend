@@ -1,16 +1,34 @@
-import {Song} from './entity'
-import {getRepository} from 'typeorm'
-import {RequestHandler} from 'express'
-import {saveEntity, findAllEntitys, findEntity} from '../../db/utils'
-import {sendFP} from '../utils'
+import { Song } from './entity'
+import { RequestHandler } from 'express'
+import { sendFP } from '../utils'
+import { getRepository } from 'typeorm'
+import { sendDBResponse } from '../utils'
+import { getEntity, getAllEntitys, updateEntity } from '../../db/utils'
 
-export const getSong: RequestHandler<{id?: string}> = (req, res) =>
-  findEntity(getRepository(Song), sendFP(res), sendFP(res))(req.params.id)
+export const getSong: RequestHandler<{ id: string }> = (req, res) => {
+  const getSongTask = getEntity(getRepository(Song))(req.params.id)
 
-export const getSongs: RequestHandler = (req, res) =>
-  findAllEntitys(getRepository(Song), sendFP(res))()
+  sendDBResponse<Song>
+    (res)
+    (getSongTask)
+}
 
-export const addSong: RequestHandler = (req, res) =>
+export const getSongList: RequestHandler = (req, res) => {
+  const getSongListTask = getAllEntitys(getRepository(Song))()
+
+  sendDBResponse<Song[]>
+    (res)
+    (getSongListTask)
+}
+
+export const updateSong: RequestHandler = (req, res) => {
   Song.songParamsToEitherSong(req.body as unknown)
     .ifLeft(sendFP(res))
-    .ifRight(saveEntity(getRepository(Song), sendFP(res)))
+    .ifRight((song) => {
+      const updateEntityTask = updateEntity(getRepository(Song))(song)
+
+      sendDBResponse<Song>
+        (res)
+        (updateEntityTask)
+    })
+}
