@@ -1,33 +1,33 @@
+import { node } from 'fluture'
+
 import * as express from 'express'
-import * as session from 'express-session'
 import * as cors from 'cors'
 import * as path from 'path'
-import * as passport from 'passport'
 
 import { ignoreMiddleware } from './middlewars/ignore'
-import songRouter from './song/router'
-import authRouter from './user/router'
 
-import { PORT, SESSION_SECRET } from '../utils/secrets'
-import { node } from 'fluture'
+import songRouter from './song/router'
+import authRouter from './auth/router'
+import userRouter from './user/router'
+
+import { PORT } from '../utils/secrets'
 
 export const connectExpressTask = node<any, never>((done) => {
   try {
-    express()
+    const app = express()
+
+    app
       .use(cors())
       .use(ignoreMiddleware())
       .use(express.static(path.join(__dirname, 'public')))
       .use(express.json())
-      .use(
-        session({
-          secret: SESSION_SECRET as string,
-        }),
-      )
-      .use(passport.initialize())
-      .use(passport.session())
+    
+    app
       .use('/song', songRouter)
+      .use('/user', userRouter)
       .use('/auth', authRouter)
-      .listen(PORT, () => done(null))
+
+    app.listen(PORT, () => done(null))
   } catch (e) {
     done(e)
   }

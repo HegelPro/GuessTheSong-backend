@@ -25,7 +25,9 @@
    "dependencies": {
       "@koa/cors": "^3.0.0",
       "@types/cors": "^2.8.6",
+      "@types/express-jwt": "0.0.42",
       "@types/express-session": "^1.17.0",
+      "@types/jsonwebtoken": "^8.3.8",
       "@types/koa-multer": "^1.0.0",
       "@types/koa-static": "^4.0.1",
       "@types/multer": "^1.4.2",
@@ -35,6 +37,7 @@
       "crypto": "^1.0.1",
       "dotenv": "^8.2.0",
       "express": "^4.17.1",
+      "express-jwt": "^5.3.1",
       "express-session": "^1.17.0",
       "fantasy-land": "^4.0.1",
       "fluture": "^12.2.0",
